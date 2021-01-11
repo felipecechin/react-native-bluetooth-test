@@ -43,6 +43,15 @@ void loop_scomm() {
   analyses_buffer();
 }
 
+void send_ack(uint8_t ack_number){
+  uint8_t msg_ack[4]={ACK, ack_number, 0, 0};
+  msg_ack[2]=crc8_buf(msg_ack, 2);
+  msg_ack[3]=~msg_ack[2];
+  for (uint8_t i=0; i<4; i++)
+    Serial.print(msg_ack[i]);
+  Serial.print("\r\n");
+}
+
 uint8_t buff_get_byte(uint8_t pos){
   uint8_t p = b.bbeg+pos>=BUFF_SIZE?(b.bbeg+pos)%BUFF_SIZE:b.bbeg+pos;
   return b.buf[p];
@@ -57,27 +66,27 @@ static void parse_msg(uint8_t cod_msg) {
     return;
   }
   // ML
-  // | 8 bits | 8 bits | 8 bits | 8 bits | 8 bits |  -> 5 bytes
-  // | 1 (cod)| speed h| speed v|  crc   |  ~crc  |
+  // | 8 bits | 8 bits | 8 bits | 8 bits | 8 bits | 8 bits |  -> 6 bytes
+  // | 1 (cod)| speed h| speed v| acknum |  crc   |  ~crc  |
   else if (cod_msg == MOTOR) { // motors
     uint8_t h = buff_get_byte(+1);
     uint8_t v = buff_get_byte(+2);
+    uint8_t ack = buff_get_byte(+3);
     run_motors(h, v);
     debug("RunMotors",0);
     debug(h,0);
     debug(",",0);
     debug(v,1);
-    Serial.print("A");
-    Serial.print("\r\n");
+    send_ack(ack);
   }
   // STOP
-  // | 8 bits | 8 bits | 8 bits |  -> 3 bytes
-  // | 0 (cod)|  crc   |  ~crc  |  
+  // | 8 bits | 8 bits | 8 bits | 8 bits |  -> 4 bytes
+  // | 0 (cod)| ackNum |  crc   |  ~crc  |  
   else if (cod_msg == STOP) { // stop motors
+    uint8_t ack = buff_get_byte(+1);
     stop_motors();
     debug("StopMotors",1);
-    Serial.print("A");
-    Serial.print("\r\n");
+    send_ack(ack);
   }
 }
 
@@ -118,8 +127,6 @@ bool decode_1() {
   }
   return true;
 }
-
-
 
 void analyses_buffer(){
   // smaller package has 3 bytes

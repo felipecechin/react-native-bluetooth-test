@@ -12,9 +12,9 @@
 #define BLUETOOTHSPEED 115200//460800 //9600//115200
 
 // General
-#define NUMOPS 3
-enum operations {ERR, MOTOR, STOP};
-  uint8_t tam_msg[NUMOPS] = { 3, 5, 3 }; // ERR, MOTOR, ACK, STOP
+#define NUMOPS 4
+enum operations {ERR, MOTOR, ACK, STOP};
+  uint8_t tam_msg[NUMOPS] = { 3, 6, 4, 4 }; // ERR, MOTOR, ACK, STOP
 
 //Buffer
 #define BUFF_SIZE 256

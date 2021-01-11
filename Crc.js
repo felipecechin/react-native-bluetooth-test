@@ -22,9 +22,11 @@ async function crc8(crc, val) {
 export default async function crc8_buf(buff, pos, len){
   const crc = new Uint8Array([0]);
   let p = pos;
-  while (len--) {
-    crc[0] = crc8(crc[0], buff[p]);
+  let l = len;
+  while (l>0) {
+    crc[0] = await crc8(crc[0], buff[p]);
     p++;
+    l--;
   }
   return crc[0];
 }
