@@ -44,12 +44,16 @@ void loop_scomm() {
 }
 
 void send_ack(uint8_t ack_number){
-  uint8_t msg_ack[4]={ACK, ack_number, 0, 0};
-  msg_ack[2]=crc8_buf(msg_ack, 2);
-  msg_ack[3]=~msg_ack[2];
-  for (uint8_t i=0; i<4; i++)
+  uint8_t msg_ack[2]={ACK, ack_number};
+  for (uint8_t i=0; i<2; i++)
     Serial.print(msg_ack[i]);
   Serial.print("\r\n");
+/*TODO: CRC  uint8_t msg_ack[6]={ACK, ack_number, 0, 0,'\r','\n'};
+  msg_ack[2]=crc8_buf(msg_ack, 2);
+  msg_ack[3]=~msg_ack[2];
+  for (uint8_t i=0; i<6; i++)
+    Serial.print(msg_ack[i]);
+*/
 }
 
 uint8_t buff_get_byte(uint8_t pos){

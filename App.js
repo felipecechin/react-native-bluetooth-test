@@ -1,10 +1,8 @@
 import React, {Component} from 'react';
 import commonStyles from './commonStyles';
 import AxisPad from 'react-native-axis-pad';
-import crc8_buf from './Crc';
 import handleJoystick from "./Joystick";
 import sendStop from "./Joystick"
-import {Buffer} from 'buffer';
 import {
     //Platform,
     StyleSheet,
@@ -146,8 +144,12 @@ class App extends Component<{}> {
         }
     }
 
+    getAckNumber(){
+        let ack = this.state.ackNumber++%10;
+        return ack.toString();
+    }
     async toggleSwitch() {
-        await sendStop(this.state.ackNumber++);
+        await sendStop(this.getAckNumber());
     }
 
     sendBytes() {
@@ -194,7 +196,7 @@ class App extends Component<{}> {
                     handlerSize={50}
                     resetOnRelease={true}
                     autoCenter={true}
-                    onValue={({x, y}) => handleJoystick(x, y, this.state.ackNumber++)}>
+                    onValue={({x, y}) => handleJoystick(x, y, this.getAckNumber())}>
                   </AxisPad>
 
                   <View>
@@ -230,7 +232,7 @@ export default withSubscription({ subscriptionName: "events" })(App);
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#F5FCFF',
+        backgroundColor: '#f5fcff',
     },
     toolbar: {
         paddingTop: 30,

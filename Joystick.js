@@ -7,13 +7,13 @@ export default async function  handleJoystick (x, y, ackNumber) {
   const [horizontal, vertical] = await parseJoystick(x, y);
   let data;
   if (horizontal === 128 && vertical === 128) {
-    await sendStop(ackNumber);
-    data=await BluetoothSerial.readUntilDelimiter("\r\n");
+    await sendStop(ackNumber.toString(10));
+    data=await BluetoothSerial.readUntilDelimiter(ackNumber+"\r\n");
     console.log("ReceivedStop: " + data);
   }
   else {
     await sendJoystickData(horizontal, vertical, ackNumber);
-    data = await BluetoothSerial.readUntilDelimiter("\r\n");
+    data = await BluetoothSerial.readUntilDelimiter(ackNumber+"\r\n");
     console.log("ReceivedRunMotors: " + data);
   }
 };
